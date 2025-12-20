@@ -1,0 +1,7 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="Mine/Mine.vcxproj" Id="9a52d532-fa0e-4c54-acd8-422f662ab8d0" />
+</Solution>
