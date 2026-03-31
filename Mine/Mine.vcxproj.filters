@@ -944,6 +944,9 @@
     <ClInclude Include="scripts\worldRender\Noise\PerlinNoise.h">
       <Filter>Pliki nagłówkowe</Filter>
     </ClInclude>
+    <ClInclude Include="scripts\worldRender\Noise\SimpleNoise.h">
+      <Filter>Pliki nagłówkowe</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="scripts\shaders\vertexShader.glsl" />
@@ -1377,6 +1380,9 @@
       <Filter>Pliki zasobów</Filter>
     </Image>
     <Image Include="graphics\textureAtlas.png">
+      <Filter>Pliki zasobów</Filter>
+    </Image>
+    <Image Include="graphics\test.png">
       <Filter>Pliki zasobów</Filter>
     </Image>
   </ItemGroup>

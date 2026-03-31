@@ -32,12 +32,14 @@ public:
 				float heightNoise = amp * perlinNoise::perlin2((x + xGlobalOffset * chunkSizeX) * freq, (z + zGlobalOffset * chunkSizeZ) * freq);
 				heightNoise += amp2 * perlinNoise::perlin2((x + xGlobalOffset * chunkSizeX) * freq2 + offset2, (z + zGlobalOffset * chunkSizeZ) * freq2 + offset2);
 				heightNoise += amp3 * perlinNoise::perlin2((x + xGlobalOffset * chunkSizeX) * freq3 + offset3, (z + zGlobalOffset * chunkSizeZ) * freq3 + offset3);
+				int heightLevel = ceil(heightNoise * topY);
 				for (int y = bottomY; y < topY; y++) {
-					if (y < heightNoise * topY)
+					if (y < heightLevel)
 						chunk[x][y][z] = Block::BlockType::DIRT;
-					else
+					else if (y == heightLevel)
+						chunk[x][y][z] = Block::BlockType::GRASSBLOCK;
+					else 
 						chunk[x][y][z] = Block::BlockType::AIR;
-
 				}
 			}
 		}
@@ -87,14 +89,18 @@ public:
 		// TODO texture atlas
 		glGenTextures(1, &texture);
 		glBindTexture(GL_TEXTURE_2D, texture);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 		int width, height, channels;
-		unsigned char* data = stbi_load("graphics\\dirtblock.jpg", &width, &height, &channels, 0);
+		unsigned char* data = stbi_load("graphics\\textureAtlas.png", &width, &height, &channels, 0);
 		if (!data) {
 			std::cerr << "Failed to load dirt texture" << std::endl;
 		}
 		else {
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 			glGenerateMipmap(GL_TEXTURE_2D);
 			stbi_image_free(data);
 		}
