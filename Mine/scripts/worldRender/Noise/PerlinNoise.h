@@ -29,7 +29,7 @@ namespace perlinNoise {
 	};
 
 	static const vector2 GRAD2[8] = {
-		{1, 1}, {-1, 1}, {1, -1}, {-1, -1}, {1, 0}, {-1, 0}, {0, 1}, {0, -1}
+		{1 / sqrt(2), 1 / sqrt(2)}, {-1 / sqrt(2), 1 / sqrt(2)}, {1 / sqrt(2), -1 / sqrt(2)}, {-1 / sqrt(2), -1 / sqrt(2)}, {1, 0}, {-1, 0}, {0, 1}, {0, -1}
 	};
 
 
@@ -51,7 +51,7 @@ namespace perlinNoise {
 	}
 
 	vector2 randomGradient(int ix, int iy) {
-		unsigned h = hash(ix & 255, iy & 255);
+		unsigned h = hash(ix, iy);
 		return GRAD2[h % 8];
 	}
 
@@ -77,19 +77,24 @@ namespace perlinNoise {
 		return dx * gradient.x + dy * gradient.y;
 	}
 
+	// klasyczna funckja perlin noise czyli fade
+	float fade(float t) {
+		return t * t * t * (t * (t * 6 - 15) + 10);
+	}
+
 	float interpolate(float a0, float a1, float w) {
-		return (a1 - a0) * (3.0 - w * 2.0) * w * w + a0;
+		return a0 + (a1 - a0) * fade(w);
 	}
 
 	// Sample Perlin noises at coordinates x,y 
 	float perlin3(float x, float y, float z) { // caves 
 		// Determine grid cell corner coordinates
-		x = abs(x);
-		y = abs(y);
-		z = abs(z);
-		int x0 = static_cast<int>(x);
-		int y0 = static_cast<int>(y);
-		int z0 = static_cast<int>(z);
+		//x = abs(x);
+		//y = abs(y);
+		//z = abs(z);
+		int x0 = (int)floor(x);
+		int y0 = (int)floor(y);
+		int z0 = (int)floor(z);
 		int x1 = x0 + 1;
 		int y1 = y0 + 1;
 		int z1 = z0 + 1;
@@ -125,16 +130,17 @@ namespace perlinNoise {
 		return value;
 	}
 
-	float perlin2(float x, float y) {
+
+	float perlin2_raw(float x, float y) {
 		// TODO this is a temp fix for negative values
-		x = abs(x);
-		y = abs(y);
-		int x0 = static_cast<int>(x);
-		int y0 = static_cast<int>(y);
+		//x = abs(x);
+		//y = abs(y);
+		int x0 = (int)std::floor(x);
+		int y0 = (int)std::floor(y);
 		int x1 = x0 + 1;
 		int y1 = y0 + 1;
-		float sx = x - static_cast<float>(x0);
-		float sy = y - static_cast<float>(y0);
+		float sx = x - (float)(x0);
+		float sy = y - (float)(y0);
 
 		float n0 = dotGridGradient(x0, y0, x, y);
 		float n1 = dotGridGradient(x1, y0, x, y);
@@ -148,6 +154,20 @@ namespace perlinNoise {
 
 		float value = interpolate(ix0, ix1, sy);
 
+		return value;
+	}
+
+
+	float perlin2(float x, float y) {
+		float value = perlin2_raw(x, y);
+		
+		// normalizacja do przedzialo [0, 1]
+		value *= 0.9f;  
+		value = value * 0.5f + 0.5f;
+
+		if (value < 0.0f) value = 0.0f;
+		if (value > 1.0f) value = 1.0f;
+	
 		return value;
 	}
 

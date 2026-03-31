@@ -63,10 +63,10 @@ int main() {
 	glfwSetScrollCallback(window, scroll_callback);
 
 	// world chunk
-	std::shared_ptr<ChunkManager> worldChunk = std::make_shared<ChunkManager>(1);
+	std::shared_ptr<ChunkManager> worldChunk = std::make_shared<ChunkManager>(8);
 
 	std::thread chunkUpdateThread(chunkUpdate, std::ref(*worldChunk));
-	worldChunk->disableNewChunkGeneration();
+	//worldChunk->disableNewChunkGeneration();
 
 	// render loop
 	while (!glfwWindowShouldClose(window)) {

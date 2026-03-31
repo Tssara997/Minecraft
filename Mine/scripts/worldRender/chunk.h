@@ -13,39 +13,27 @@ class Chunk {
 public:
 	std::vector<float> vertexBuffer;
 
-	Chunk(short int xGlobalOffset, short int zGlobalOffset) : xGlobalOffset{ xGlobalOffset }, zGlobalOffset{ zGlobalOffset }, gpuUploaded{ false }, noiseGenerator{2} {
+	Chunk(short int xGlobalOffset, short int zGlobalOffset) : xGlobalOffset{ xGlobalOffset }, zGlobalOffset{ zGlobalOffset }, gpuUploaded{ false }, noiseGenerator{1} {
 		generateChunkData();
 		generateMesh();
 	}
 
 	void generateChunkData() {
-		float freq = 0.01f;
-		float freq2 = 0.1f;
-		float amp = 10.0f;
-		float amp2 = 3.0f;
+		float freq = 0.02f;
+		float freq2 = 0.01f;
+		float freq3 = 0.2f;
+		float offset2 = 50.3f;
+		float offset3 = 100.7f;
+		float amp = 0.8f;
+		float amp2 = 0.1f;
+		float amp3 = 0.1f;
 		for (int x = 0; x < chunkSizeX; x++) {
 			for (int z = 0; z < chunkSizeZ; z++) {
+				float heightNoise = amp * perlinNoise::perlin2((x + xGlobalOffset * chunkSizeX) * freq, (z + zGlobalOffset * chunkSizeZ) * freq);
+				heightNoise += amp2 * perlinNoise::perlin2((x + xGlobalOffset * chunkSizeX) * freq2 + offset2, (z + zGlobalOffset * chunkSizeZ) * freq2 + offset2);
+				heightNoise += amp3 * perlinNoise::perlin2((x + xGlobalOffset * chunkSizeX) * freq3 + offset3, (z + zGlobalOffset * chunkSizeZ) * freq3 + offset3);
 				for (int y = bottomY; y < topY; y++) {
-					// jaskinie
-					
-					//float val = perlinNoise::perlin((x + xGlobalOffset * chunkSizeX) * freq, y * freq, (z + zGlobalOffset * chunkSizeZ) * freq);
-					////val = 10 + val * amp;
-					//if (val > 0.0f)
-					//	chunk[x][y][z] = Block::BlockType::DIRT;
-					//else
-					//	chunk[x][y][z] = Block::BlockType::AIR;
-
-					// teren
-
-					float heightNoise = 0;
-					float height = 0;
-					//heightNoise += perlinNoise::perlin2((x + xGlobalOffset * chunkSizeX) * freq, (z + zGlobalOffset * chunkSizeZ) * freq);
-					//height += heightNoise * amp;
-
-					heightNoise += noiseGenerator.simplexNoise3D((x + xGlobalOffset * chunkSizeX) * freq, y*freq2, (z + zGlobalOffset * chunkSizeZ) * freq * 2);
-					//std::cout << heightNoise << std::endl;
-
-					if (y < heightNoise)
+					if (y < heightNoise * topY)
 						chunk[x][y][z] = Block::BlockType::DIRT;
 					else
 						chunk[x][y][z] = Block::BlockType::AIR;
@@ -101,7 +89,7 @@ public:
 		glBindTexture(GL_TEXTURE_2D, texture);
 
 		int width, height, channels;
-		unsigned char* data = stbi_load("graphics\\block.jpg", &width, &height, &channels, 0);
+		unsigned char* data = stbi_load("graphics\\dirtblock.jpg", &width, &height, &channels, 0);
 		if (!data) {
 			std::cerr << "Failed to load dirt texture" << std::endl;
 		}
