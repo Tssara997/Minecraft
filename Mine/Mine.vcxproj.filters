@@ -30,6 +30,9 @@
     <ClCompile Include="scripts\worldRender\block.cpp">
       <Filter>Pliki źródłowe</Filter>
     </ClCompile>
+    <ClCompile Include="scripts\worldRender\chunk.cpp">
+      <Filter>Pliki źródłowe</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="scripts\shaders\Shader_H.h">

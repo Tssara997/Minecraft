@@ -132,6 +132,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="scripts\worldRender\chunk.cpp" />
     <ClCompile Include="dependencies\glad\glad.c" />
     <ClCompile Include="dependencies\glm\detail\glm.cpp" />
     <ClCompile Include="dependencies\glm\glm.cppm" />
