@@ -55,10 +55,10 @@ public:
 		for (auto& chunk : renderChunks) {
 			if (!chunk)
 				continue;
-			short int chunkX = chunk->getChunkPositonX() * 16;
-			short int chunkZ = chunk->getChunkPositonZ() * 16;
-			if (abs(chunkX - currentPos.x) > renderDistance * 16 + 16 ||
-				abs(chunkZ - currentPos.z) > renderDistance * 16 + 16) {
+			short int chunkX = chunk->getChunkPositonX() * chunkSize;
+			short int chunkZ = chunk->getChunkPositonZ() * chunkSize;
+			if (abs(chunkX - currentPos.x) > renderDistance * chunkSize + chunkSize ||
+				abs(chunkZ - currentPos.z) > renderDistance * chunkSize + chunkSize) {
 				chunk->clearMesh();
 				chunk.reset();
 			}
@@ -71,6 +71,31 @@ public:
 				renderChunks.erase(renderChunks.begin() + i);
 				i--;
 				continue;
+			}
+		}
+	}
+
+	bool isBlock(glm::vec3 pos) {
+		int chunkX = static_cast<int>(std::floor(pos.x / chunkSize));
+		int chunkZ = static_cast<int>(std::floor(pos.z / chunkSize));
+
+		for (const auto& chunk : renderChunks) {
+			if (!chunk) continue;
+			if (chunk->getChunkPositonX() == chunkX && chunk->getChunkPositonZ() == chunkZ) {
+				return chunk->isBlock(static_cast<int>(pos.x) - chunkX * chunkSize, static_cast<int>(pos.y), static_cast<int>(pos.z) - chunkZ * chunkSize);
+			}
+		}
+		return false;
+	}
+
+	void deleteBlock(glm::vec3 pos) {
+		int chunkX = static_cast<int>(std::floor(pos.x / chunkSize));
+		int chunkZ = static_cast<int>(std::floor(pos.z / chunkSize));
+
+		for (const auto& chunk : renderChunks) {
+			if (!chunk) continue;
+			if (chunk->getChunkPositonX() == chunkX && chunk->getChunkPositonZ() == chunkZ) {
+				return chunk->deleteBlock(static_cast<int>(pos.x) - chunkX * chunkSize, static_cast<int>(pos.y), static_cast<int>(pos.z) - chunkZ * chunkSize);
 			}
 		}
 	}
@@ -118,4 +143,5 @@ private:
 	mutable std::mutex chunksMutex;
 	glm::vec3 currentPos = { 0.0f, 52.0f, 0.0f };
 	bool generateNewChunks = true;
+	const short int chunkSize = 16;
 };

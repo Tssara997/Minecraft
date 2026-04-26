@@ -4,7 +4,7 @@
 #include "Noise/PerlinNoise.h"
 #include "Noise/SimpleNoise.h"
 
-Chunk::Chunk(short int xGlobalOffset, short int zGlobalOffset) : xGlobalOffset{ xGlobalOffset }, zGlobalOffset{ zGlobalOffset }, gpuUploaded{ false }, 
+Chunk::Chunk(int xGlobalOffset, int zGlobalOffset) : xGlobalOffset{ xGlobalOffset }, zGlobalOffset{ zGlobalOffset }, gpuUploaded{ false }, 
 		highlands{ { 0.002f, 0.01f, 0.05f }, { 3.0f, 1.2f, 0.3f }, { 0.0f, 50.3f, 100.7f }, 2.5f, 1.0f, "highlands"},
 		midlands{ { 0.02f, 0.01f, 0.2f }, { 0.8f, 0.1f, 0.1f }, { 0.0f, 50.3f, 100.7f }, 2.0f, 0.8f, "midlands" },
 		lowlands{ { 0.003f, 0.05f, 0.001f}, { 0.5f, 0.1f, 0.2f }, { 0.0f, 50.3f, 100.7f }, 3.0f, 0.2f, "lowlands"}
@@ -21,15 +21,12 @@ void Chunk::generateChunkData() {
 			double heightNoise{ 0 };
 			if (lowlands.chance >= biomeNoise) {
 				heightNoise = getNoiseheight(x, z, highlands);
-				std::cout << "lowlands" << std::endl;
 			}
 			else if (biomeNoise < midlands.chance) {
 				heightNoise = getNoiseheight(x, z, midlands);
-				std::cout << "midlands" << std::endl;
 			}
 			else {
 				heightNoise = getNoiseheight(x, z, highlands);
-				std::cout << "highlands" << std::endl;
 			}
 			heightNoise = abs( 1.0f - heightNoise);
 			heightNoise = floor(heightNoise * (topY - 1));
@@ -66,6 +63,26 @@ void Chunk::generateMesh() {
 			}
 		}
 	}
+}
+
+bool Chunk::isBlock(int x, int y, int z) {
+	if (x < 0 || x >= chunkSizeX || y < bottomY || y >= topY || z < 0 || z >= chunkSizeZ)
+		return false;
+	return chunk[x][y][z] != Block::BlockType::AIR;
+}
+
+void Chunk::changeBlock(int x, int y, int z, Block::BlockType block) {
+	if (x < 0 || x >= chunkSizeX || y < bottomY || y >= topY || z < 0 || z >= chunkSizeZ)
+		return;
+	chunk[x][y][z] = block;
+	clearMesh();
+	generateMesh();
+	gpuUploaded = false;
+	uploadToGPU();
+}
+
+void Chunk::deleteBlock(int x, int y, int z) {
+	changeBlock(x, y, z, Block::BlockType::AIR);
 }
 
 double Chunk::getNoiseheight(int x, int z, Biome_Data biom) const {

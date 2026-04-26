@@ -437,7 +437,8 @@
     <ClInclude Include="dependencies\GL\glew.h" />
     <ClInclude Include="dependencies\GL\glxew.h" />
     <ClInclude Include="dependencies\GL\wglew.h" />
-    <ClInclude Include="scripts\movment\Camera.h" />
+    <ClInclude Include="scripts\player\Camera.h" />
+    <ClInclude Include="scripts\player\PlayerAction.h" />
     <ClInclude Include="scripts\shaders\Shader_H.h" />
     <ClInclude Include="scripts\worldRender\block.h" />
     <ClInclude Include="scripts\worldRender\chunk.h" />
@@ -594,8 +595,6 @@
     <Text Include="dependencies\glm\CMakeLists.txt" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="graphics\dirtblock.jpg" />
-    <Image Include="graphics\test.png" />
     <Image Include="graphics\textureAtlas.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

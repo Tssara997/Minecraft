@@ -7,7 +7,8 @@
 #include <chrono>
 
 #include "shaders/Shader_H.h"
-#include "movment/Camera.h"
+#include "player/Camera.h"
+#include "player/PlayerAction.h"
 #include "worldRender/chunkManager.h"
 
 const uint32_t SCR_WIDTH = 1000;
@@ -20,9 +21,10 @@ std::atomic<bool> chunkUpdateNeeded = true;
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
-void processInput(GLFWwindow* window);
+void processInput(GLFWwindow* window, PlayerAction &playerAction);
 void calculateFPS();
 void chunkUpdate(ChunkManager& worldChunk);
+void drawCrosshair();
 
 
 int main() {
@@ -57,6 +59,10 @@ int main() {
 	// shaders
 	Shader* ourShader = new Shader("scripts\\shaders\\vertexShader.glsl", "scripts\\shaders\\fragmentShader.glsl");
 
+	int modelLoc = glGetUniformLocation(ourShader->ID, "model");
+	int viewLoc = glGetUniformLocation(ourShader->ID, "view");
+	int projLoc = glGetUniformLocation(ourShader->ID, "projection");
+
 	// mouse settings
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glfwSetCursorPosCallback(window, mouse_callback);
@@ -68,9 +74,11 @@ int main() {
 	std::thread chunkUpdateThread(chunkUpdate, std::ref(*worldChunk));
 	//worldChunk->disableNewChunkGeneration();
 
+	PlayerAction playerAction(worldChunk.get(), 5.0f);
+
 	// render loop
 	while (!glfwWindowShouldClose(window)) {
-		processInput(window);
+		processInput(window, playerAction);
 		calculateFPS();
 
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
@@ -79,18 +87,14 @@ int main() {
 		ourShader->use();
 
 		glm::mat4 model = glm::mat4(1.0f);
-		int modelLoc = glGetUniformLocation(ourShader->ID, "model");
 		if (modelLoc != -1) glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-
 		glm::mat4 view = ourCamera.getViewMatrix();
 		glm::mat4 proj = glm::perspective(glm::radians(FOV), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 1000.0f);
-
-		uint32_t viewLoc = glGetUniformLocation(ourShader->ID, "view");
 		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
-		uint32_t projLoc = glGetUniformLocation(ourShader->ID, "projection");
 		glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(proj));
 
 		worldChunk->draw(window);
+		drawCrosshair();
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
@@ -113,13 +117,14 @@ void chunkUpdate(ChunkManager& worldChunk) {
 	}
 }
 
-void processInput(GLFWwindow* window) {
+void processInput(GLFWwindow* window, PlayerAction &playerAction) {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
 		glfwSetWindowShouldClose(window, true);
 		isRunning = false;
 		chunkUpdateNeeded = false;
 	}
 	ourCamera.moveCamera(window);
+	playerAction.handleInput(window, ourCamera);
 }
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
@@ -151,4 +156,8 @@ void calculateFPS() {
 		frameCount = 0;
 		previousTime = currentTime;
 	}
+}
+
+void drawCrosshair() {
+	int x = 2;
 }

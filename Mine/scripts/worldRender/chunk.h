@@ -18,7 +18,7 @@ class Chunk {
 public:
 	std::vector<float> vertexBuffer;
 
-	Chunk(short int xGlobalOffset, short int zGlobalOffset);
+	Chunk(int xGlobalOffset, int zGlobalOffset);
 	void generateChunkData();
 	double getNoiseheight(int x, int z, Biome_Data biom) const;
 	void generateMesh();
@@ -30,6 +30,7 @@ public:
 	short int getChunkPositonZ() const;
 
 	// TODO implement block changes without regenerating whole mesh
+	bool isBlock(int x, int y, int z);
 	void changeBlock(int x, int y, int z, Block::BlockType block);
 	void deleteBlock(int x, int y, int z);
 	void changeMesh(int x, int y, int z, Block::BlockType block = Block::BlockType::AIR);
@@ -42,8 +43,8 @@ private:
 	const int topY = 86;
 	const int chunkSizeX = 16;
 	const int chunkSizeZ = 16;
-	short int xGlobalOffset;
-	short int zGlobalOffset;
+	int xGlobalOffset;
+	int zGlobalOffset;
 
 	uint32_t VAO = 0;
 	uint32_t VBO = 0;
