@@ -22,8 +22,9 @@ Zawiera podstawowy rendering świata blokowego, system chunków oraz generowanie
 Mine/
 ├── scripts/
 │   ├── main.cpp                # entry point
-│   ├── movment/
-│   │   └── Camera.h            # kamera (poruszanie się)
+│   ├── player/
+│   │   ├── Camera.h
+|   |   └── PlayerAction.h           
 │   ├── shaders/
 │   │   ├── vertexShader.glsl
 │   │   ├── fragmentShader.glsl
@@ -125,6 +126,7 @@ Uruchom bezpośrednio:
 * system chunków
 * generowanie świata (Perlin / Simple noise)
 * kamera FPS
+* nieszczenie bloków
 
 ---
 
